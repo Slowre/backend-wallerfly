@@ -4,6 +4,14 @@ const app = express()
 
 app.use(express.json())
 
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.url}`)
+    if (req.body) {
+        console.log(`${JSON.stringify(req.body, null, 2)}`)
+    }
+    next()
+})
+
 const PORT = 3030
 
 let eventos =
@@ -72,13 +80,15 @@ app.get('/api/eventos/', (req, res) => {
 
 app.get('/api/eventos/query/', (req, res) => {
     const id = req.query.id
+    console.log(id)
     if (!id) {
         return res.status(400).json({ code: 'PF', message: 'El ID de evento es requerido!' })
     }
-    const evento = eventos.find((e) => e.id = id)
+    const evento = eventos.find((e) => e.id == id)
     if (!evento) {
         return res.status(404).json({ code: 'NF', message: 'Evento no encontrado!' })
     }
+
     res.json({ code: 'OK', message: 'Eventos disponibles', data: { evento } })
 })
 
@@ -87,7 +97,7 @@ app.put('/api/eventos/:id', (req, res) => {
     if (!id) {
         return res.status(400).json({ code: 'PF', message: 'El ID de evento es requerido!' })
     }
-    const evento = eventos.find((e) => e.id = id)
+    const evento = eventos.find((e) => e.id == id)
     if (evento) {
         const { name, description, amount, date, type } = req.body
         evento.amount = amount
@@ -109,7 +119,7 @@ app.delete('/api/eventos/:id', (req, res) => {
     const evento = eventos.find((e) => e.id == id)
     if (evento) {
         eventos = eventos.filter((e) => e.id != evento.id)
-        return res.json({ code: 'OK', message: 'Evento eliminado!', data: { eventoSearch } })
+        return res.json({ code: 'OK', message: 'Evento eliminado!', data: { evento } })
     }
     res.status(404).json({ code: 'PF', message: 'Evento no encontrado!' })
 })
