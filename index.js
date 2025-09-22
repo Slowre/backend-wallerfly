@@ -73,8 +73,13 @@ app.post('/api/eventos/', (req, res) => {
     res.json({ code: 'OK', message: 'Evento creado excitosamente!', data: { evento: newEvento } })
 })
 
-app.get('/api/eventos/', (req, res) => {
-    res.json({ code: 'OK', message: 'Eventos disponibles', data: { eventos } })
+app.get('/api/eventos', (req, res) => {
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || eventos.length;
+    const start = (page - 1) * limit
+    const end = start + limit
+    const eventosPages = eventos.slice(start, end)
+    res.json({ code: 'OK', message: 'Eventos disponibles', data: { eventos: eventosPages } })
 })
 
 
